@@ -8,13 +8,21 @@ package ioc
 
 import (
 	"github.com/google/wire"
+	"loverrecipe/internal/controller"
 	"loverrecipe/internal/ioc"
+	"loverrecipe/internal/repository"
+	"loverrecipe/internal/repository/dao"
+	"loverrecipe/internal/services/dishes"
 )
 
 // Injectors from wire.go:
 
 func InitHttpServer() *ioc.App {
-	component := ioc.InitHTTP()
+	db := ioc.InitDB()
+	dishesRepository := repository.NewDishesRepository(db)
+	service := dishes.NewService(dishesRepository)
+	dishController := controller.NewDishControllerWithRegister(service)
+	component := ioc.InitHTTP(dishController)
 	v := ioc.InitTasks()
 	v2 := ioc.Crons()
 	app := &ioc.App{
@@ -28,5 +36,6 @@ func InitHttpServer() *ioc.App {
 // wire.go:
 
 var (
-	BaseSet = wire.NewSet(ioc.InitDB, ioc.InitRedisCmd, ioc.InitRedisClient, ioc.InitIDGenerator)
+	BaseSet   = wire.NewSet(ioc.InitDB, ioc.InitRedisCmd, ioc.InitRedisClient, ioc.InitIDGenerator)
+	dishesSet = wire.NewSet(dao.NewDishesDao, repository.NewDishesRepository, dishes.NewService, controller.NewDishControllerWithRegister)
 )

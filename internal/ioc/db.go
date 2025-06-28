@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/ego-component/egorm"
+	"github.com/gotomicro/ego/core/elog"
 	"loverrecipe/internal/pkg/database/metrics"
 	"loverrecipe/internal/pkg/database/tracing"
 	"loverrecipe/internal/repository/dao"
@@ -32,6 +33,7 @@ func InitDB() *egorm.Component {
 	if err != nil {
 		panic(err)
 	}
+	elog.Info("database init success")
 	return db
 }
 
@@ -55,6 +57,7 @@ func WaitForDBSetup(dsn string) {
 		if err == nil {
 			break
 		}
+		elog.Warn("WaitForDBSetup 数据库连接失败，重试中...", elog.FieldErr(err))
 		next, ok := strategy.Next()
 		if !ok {
 			panic("WaitForDBSetup 重试失败......")

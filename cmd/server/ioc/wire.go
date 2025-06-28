@@ -4,7 +4,11 @@ package ioc
 
 import (
 	"github.com/google/wire"
+	"loverrecipe/internal/controller"
 	"loverrecipe/internal/ioc"
+	"loverrecipe/internal/repository"
+	"loverrecipe/internal/repository/dao"
+	"loverrecipe/internal/services/dishes"
 )
 
 var (
@@ -14,11 +18,18 @@ var (
 		ioc.InitRedisClient,
 		ioc.InitIDGenerator,
 	)
+	dishesSet = wire.NewSet(
+		dao.NewDishesDao,
+		repository.NewDishesRepository,
+		dishes.NewService,
+		controller.NewDishControllerWithRegister,
+	)
 )
 
 func InitHttpServer() *ioc.App {
 	wire.Build(
-		//BaseSet,
+		BaseSet,
+		dishesSet,
 		ioc.Crons,
 		ioc.InitHTTP,
 		ioc.InitTasks,
