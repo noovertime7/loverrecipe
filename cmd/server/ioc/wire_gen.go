@@ -13,6 +13,8 @@ import (
 	"loverrecipe/internal/repository"
 	"loverrecipe/internal/repository/dao"
 	"loverrecipe/internal/services/dishes"
+	"loverrecipe/internal/services/user"
+	"loverrecipe/internal/token"
 )
 
 // Injectors from wire.go:
@@ -22,7 +24,13 @@ func InitHttpServer() *ioc.App {
 	dishesRepository := repository.NewDishesRepository(db)
 	service := dishes.NewService(dishesRepository)
 	dishController := controller.NewDishControllerWithRegister(service)
-	component := ioc.InitHTTP(dishController)
+	userDao := dao.NewUserDao(db)
+	userRepository := repository.NewUserRepository(userDao)
+	jwtTokenHandler := token.RegisterJwt()
+	sonyflake := ioc.InitIDGenerator()
+	userService := user.NewService(userRepository, jwtTokenHandler, sonyflake)
+	userController := controller.NewUserController(userService)
+	component := ioc.InitHTTP(dishController, userController)
 	v := ioc.InitTasks()
 	v2 := ioc.Crons()
 	app := &ioc.App{
@@ -36,6 +44,7 @@ func InitHttpServer() *ioc.App {
 // wire.go:
 
 var (
-	BaseSet   = wire.NewSet(ioc.InitDB, ioc.InitRedisCmd, ioc.InitRedisClient, ioc.InitIDGenerator)
+	BaseSet   = wire.NewSet(ioc.InitDB, ioc.InitRedisCmd, ioc.InitRedisClient, ioc.InitIDGenerator, token.RegisterJwt)
 	dishesSet = wire.NewSet(dao.NewDishesDao, repository.NewDishesRepository, dishes.NewService, controller.NewDishControllerWithRegister)
+	userSet   = wire.NewSet(dao.NewUserDao, repository.NewUserRepository, user.NewService, controller.NewUserController)
 )

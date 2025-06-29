@@ -9,6 +9,8 @@ import (
 	"loverrecipe/internal/repository"
 	"loverrecipe/internal/repository/dao"
 	"loverrecipe/internal/services/dishes"
+	"loverrecipe/internal/services/user"
+	"loverrecipe/internal/token"
 )
 
 var (
@@ -17,6 +19,7 @@ var (
 		ioc.InitRedisCmd,
 		ioc.InitRedisClient,
 		ioc.InitIDGenerator,
+		token.RegisterJwt,
 	)
 	dishesSet = wire.NewSet(
 		dao.NewDishesDao,
@@ -24,12 +27,19 @@ var (
 		dishes.NewService,
 		controller.NewDishControllerWithRegister,
 	)
+	userSet = wire.NewSet(
+		dao.NewUserDao,
+		repository.NewUserRepository,
+		user.NewService,
+		controller.NewUserController,
+	)
 )
 
 func InitHttpServer() *ioc.App {
 	wire.Build(
 		BaseSet,
 		dishesSet,
+		userSet,
 		ioc.Crons,
 		ioc.InitHTTP,
 		ioc.InitTasks,

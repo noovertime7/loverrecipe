@@ -2,11 +2,15 @@ package ioc
 
 import (
 	"github.com/gotomicro/ego/server/egin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"loverrecipe/internal/controller"
 )
 
-func InitHTTP(d *controller.DishController) *egin.Component {
+func InitHTTP(d *controller.DishController, user *controller.UserController) *egin.Component {
 	server := egin.Load("server.http").Build()
+	// 添加 Swagger 路由
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	dishesGroup := server.Group("/api/v1/dishes")
 	{
@@ -36,6 +40,12 @@ func InitHTTP(d *controller.DishController) *egin.Component {
 
 		// 获取带种类信息的菜品
 		dishesGroup.GET("/with-type", d.GetDishesWithTypeInfo)
+	}
+
+	{
+		// 用户注册
+		usersGroup := server.Group("/api/v1/users")
+		usersGroup.POST("/register", user.Register)
 	}
 
 	return server

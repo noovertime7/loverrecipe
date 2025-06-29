@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	ID        int64  `gorm:"primaryKey;type:BIGINT;comment:'用户ID'"`
+	ID        uint64 `gorm:"primaryKey;type:BIGINT;comment:'用户ID'"`
 	Username  string `gorm:"type:VARCHAR(50);uniqueIndex:uni_users_username;comment:'用户名'"`
 	Password  string `gorm:"type:VARCHAR(255);comment:'密码(加密后)'"`
 	Avatar    string `gorm:"type:VARCHAR(200);comment:'头像URL'"`
