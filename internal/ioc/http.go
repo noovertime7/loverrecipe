@@ -44,7 +44,7 @@ func InitHTTP(d *controller.DishController, user *controller.UserController) *eg
 
 	{
 		// 用户注册
-		usersGroup := server.Group("/api/v1/users")
+		usersGroup := server.Group("/api/v1/user")
 		usersGroup.POST("/register", user.Register)
 	}
 
