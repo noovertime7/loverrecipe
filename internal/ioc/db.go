@@ -17,15 +17,20 @@ import (
 
 func InitDB() *egorm.Component {
 	WaitForDBSetup(econf.GetString("mysql.dsn"))
+	auto := econf.GetBool("mysql.auto_migrate")
+
 	db := egorm.Load("mysql").Build()
-	err := dao.InitTables(db)
-	if err != nil {
-		panic(err)
+	if auto {
+		err := dao.InitTables(db)
+		if err != nil {
+			panic(err)
+		}
 	}
+
 	// 这个是自己手搓的
 	tracePlugin := tracing.NewGormTracingPlugin()
 	metricsPlugin := metrics.NewGormMetricsPlugin()
-	err = db.Use(tracePlugin)
+	err := db.Use(tracePlugin)
 	if err != nil {
 		panic(err)
 	}

@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	ID        int64  `gorm:"primaryKey;type:BIGINT;comment:'用户ID'"`
-	Username  string `gorm:"type:VARCHAR(50);uniqueIndex:idx_username;comment:'用户名'"`
+	Username  string `gorm:"type:VARCHAR(50);uniqueIndex:uni_users_username;comment:'用户名'"`
 	Password  string `gorm:"type:VARCHAR(255);comment:'密码(加密后)'"`
 	Avatar    string `gorm:"type:VARCHAR(200);comment:'头像URL'"`
 	Status    int64  `gorm:"type:BIGINT;default:1;comment:'状态 1:正常 0:禁用'"`
